@@ -1,7 +1,7 @@
 <template>
   <div>
     <div id="firebaseui-auth-container" />
-    <v-progress-circular v-show="!isSignInUILoaded" :size="50" color="primary" indeterminate />
+    <!--v-progress-circular v-show="!isSignInUILoaded" :size="50" color="primary" indeterminate /-->
   </div>
 </template>
 
@@ -21,6 +21,7 @@ export default {
     this.$nextTick(() => {
       this.setupSignInUi()
     })
+    // setTimeout(this.setupSignInUi, 800)
   },
   methods: {
     setupSignInUi () {
@@ -37,7 +38,7 @@ export default {
           // Leave the lines as is for the providers you want to offer your users.
           {
             provider: firebase.auth.EmailAuthProvider.PROVIDER_ID,
-            requireDisplayName: false
+            requireDisplayName: true
           }
         ],
         // tosUrl and privacyPolicyUrl accept either url string or a callback
@@ -53,7 +54,13 @@ export default {
       // Initialize the FirebaseUI Widget using Firebase.
 
       // The start method will wait until the DOM is loaded.
-      ui.start('#firebaseui-auth-container', uiConfig)
+
+      // this.$nextTick(() => {
+      //   ui.start('#firebaseui-auth-container', uiConfig)
+      // })
+      setTimeout(() => {
+        ui.start('#firebaseui-auth-container', uiConfig)
+      }, 800)
     }
   }
 }

@@ -1,15 +1,34 @@
-<template>
-  <Auth @loggedIn="loggedIn">
-    <SignIn :redirect="resultRedirect" />
-  </Auth>
+<template lang="pug">
+  Auth(@loggedIn="onLoggedIn" :on-failed-authentication="onFailedAuthentication")
+    div.wrap-sign-ui.f.fh
+      div.sign-ui
+        div.f.fc.mb14
+          span.welcome Welcome to Ghost Rights
+        SignIn(:redirect="resultRedirect")
 </template>
 
+<style lang="scss" scoped>
+.wrap-sign-ui {
+  width: 100%;
+  height: 100vh;
+  .sign-ui {
+    width: 90%;
+    .welcome {
+      font-weight: bold;
+    }
+  }
+}
+</style>
+
 <script>
-import Auth from '@/components/auth'
-import SignIn from '@/components/sign-in/firebase-sign-in-ui'
+// import firebase from "firebase"
+import db from '@/components/utils/firebase'
+import { firebase } from '@/components/utils/firebase'
 
 import { createNamespacedHelpers } from 'vuex'
-import { setTimeout } from 'timers'
+
+import Auth from '@/components/auth'
+import SignIn from '@/components/sign-in/firebase-sign-in-ui'
 const { mapState: mapStateAuth } = createNamespacedHelpers('auth')
 
 export default {
@@ -20,7 +39,7 @@ export default {
   props: {
     redirect: {
       type: String,
-      default: 'home'
+      default: 'top'
     },
     id: {
       type: String,
@@ -34,8 +53,8 @@ export default {
     ...mapStateAuth(['isLoggedIn', 'uid', 'isAnonymous'])
   },
   created () {
-    if (this.id === '' && this.home !== 'home') this.resultRedirect = `/${this.redirect}`
-    if (this.id !== '' && this.home !== 'home') this.resultRedirect = `/${this.redirect}/${this.id}`
+    // if (this.id === '' && this.home !== 'home') this.resultRedirect = `/${this.redirect}`
+    // if (this.id !== '' && this.home !== 'home') this.resultRedirect = `/${this.redirect}/${this.id}`
   },
   mounted () {
     setTimeout(() => {
@@ -45,14 +64,52 @@ export default {
     }, 100)
   },
   methods: {
-    async loggedIn () {
-      if (!this.isAnonymous) {
+    onFailedAuthentication () {
+
+    },
+    async onLoggedIn () {
+      if (this.uid && !this.isAnonymous) {
+        var userDoc = await db.collection('users').doc(this.uid).get()
+
+        if (!userDoc.exists) {
+          var user = await firebase.auth().currentUser
+
+          var userObj = {
+            uid: user.uid,
+            name: user.displayName,
+            // email: user.email,
+            profile: 'No Profile',
+            userIcon: user.photoURL,
+            lastSignInTime: user.metadata.lastSignInTime,
+            createdAt: user.metadata.creationTime
+          }
+
+          await db.collection('users')
+            .doc(user.uid)
+            .set(userObj)
+            .then(function () {
+              // console.log('Document successfully written!')
+            })
+            .catch(function (error) {
+              console.error('Error writing document: ', error)
+            })
+
+          if (this.$route.params.projectId) {
+            var project = await this.loadProject(this.$route.params.projectId)
+            var scenarioArray = await this.loadScenarioByProjectId(this.$route.params.projectId)
+
+            await this.copyProject({
+              uid: user.uid,
+              userDisplayName: user.displayName,
+              scenario: scenarioArray,
+              project: project
+            })
+          }
+        }
+
         this.$router.push(`${this.resultRedirect}`)
-      }
+      } // if (this.uid && !this.isAnonymous) {
     }
   }
 }
 </script>
-
-<style>
-</style>

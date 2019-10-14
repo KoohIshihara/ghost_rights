@@ -22,6 +22,7 @@
     "sass-loader": "^8.0.0",
     "vue": "^2.6.10",
     "vue-router": "^3.0.3",
+    "vue2-content-editor": "https://github.com/tui2tone/vue2-medium-editor",
     "vuetify": "^1.5.5",
     "vuex": "^3.0.1"
   },

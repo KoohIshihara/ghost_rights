@@ -4,6 +4,7 @@ import Top from './views/Top.vue'
 // import Calendar from './views/Calendar.vue'
 import ArticleSettings from './views/ArticleSettings.vue'
 import MyPage from './views/MyPage.vue'
+import EditArticle from './views/EditArticle.vue'
 
 Vue.use(Router)
 
@@ -22,6 +23,16 @@ export default new Router({
       component: MyPage
     },
     {
+      path: '/edit-article/:id',
+      name: 'edit-article',
+      component: EditArticle
+    },
+    {
+      path: '/article-settings/:id',
+      name: 'ArticleSettings',
+      component: ArticleSettings
+    },
+    {
       path: '/sign-in',
       name: 'sign-in',
       props: true,
@@ -34,16 +45,6 @@ export default new Router({
       props: true,
       component: () =>
         import(/* webpackChunkName: "route-SignIn" */ '@/views/SignIn')
-    },
-    {
-      path: '/article-settings',
-      name: 'ArticleSettings',
-      component: ArticleSettings
     }
-    // {
-    //   path: '/calendar/:id',
-    //   name: 'calendar',
-    //   component: Calendar
-    // }
   ]
 })
