@@ -84,6 +84,8 @@ export default {
             createdAt: user.metadata.creationTime
           }
 
+          if (!userObj.userIcon) userObj.userIcon = 'https://firebasestorage.googleapis.com/v0/b/ghost-rights.appspot.com/o/util%2Fghost_rights_logo.png?alt=media&token=d41dafb7-3a8d-49af-bc7a-95b2f4a5b304'
+
           await db.collection('users')
             .doc(user.uid)
             .set(userObj)
