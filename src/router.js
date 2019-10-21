@@ -28,8 +28,13 @@ export default new Router({
       component: EditArticle
     },
     {
+      path: '/article-settings',
+      name: 'new-article-settings',
+      component: ArticleSettings
+    },
+    {
       path: '/article-settings/:id',
-      name: 'ArticleSettings',
+      name: 'article-settings',
       component: ArticleSettings
     },
     {
@@ -40,8 +45,15 @@ export default new Router({
         import(/* webpackChunkName: "route-SignIn" */ '@/views/SignIn')
     },
     {
-      path: '/sign-in/:redirect',
-      name: 'sign-in',
+      path: '/sign-up',
+      name: 'sign-up',
+      props: true,
+      component: () =>
+        import(/* webpackChunkName: "route-SignIn" */ '@/views/SignIn')
+    },
+    {
+      path: '/sign-up/:redirect',
+      name: 'sign-up-with-redirect',
       props: true,
       component: () =>
         import(/* webpackChunkName: "route-SignIn" */ '@/views/SignIn')

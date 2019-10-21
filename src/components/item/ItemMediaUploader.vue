@@ -24,7 +24,7 @@
     .img-wrapper {
       width: 100%;
       height: 100%;
-      min-height: 294px;
+      min-height: 232px;
       img {
         object-fit: cover;
         min-height: 100%;
@@ -126,7 +126,7 @@ export default {
     // アップロードした画像を表示
     createImage (file) {
       // 画像リサイズ後の最大値の幅
-      const THUMBNAIL_WIDTH = 800
+      const THUMBNAIL_WIDTH = 1200
       const THUMBNAIL_HEIGHT = 800
 
       var imgCanvas = this.$refs.imgCanvas
@@ -194,7 +194,7 @@ export default {
       // ストレージオブジェクト作成
       var storageRef = strage.ref()
       // ファイルのパスを設定
-      var mountainsRef = storageRef.child(`media/${this.imgId}.jpg`)
+      var mountainsRef = storageRef.child(`articles/${this.imgId}.jpg`)
       // ファイルを適用してファイルアップロード開始
       // mountainsRef.put(this.imageFile).then(snapshot => {
       mountainsRef.putString(base64.split(',')[1], 'base64').then(snapshot => {

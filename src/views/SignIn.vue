@@ -79,12 +79,12 @@ export default {
             name: user.displayName,
             // email: user.email,
             profile: 'No Profile',
-            userIcon: user.photoURL,
+            iconURL: user.photoURL,
             lastSignInTime: user.metadata.lastSignInTime,
             createdAt: user.metadata.creationTime
           }
 
-          if (!userObj.userIcon) userObj.userIcon = 'https://firebasestorage.googleapis.com/v0/b/ghost-rights.appspot.com/o/util%2Fghost_rights_logo.png?alt=media&token=d41dafb7-3a8d-49af-bc7a-95b2f4a5b304'
+          if (!userObj.iconURL) userObj.iconURL = 'https://firebasestorage.googleapis.com/v0/b/ghost-rights.appspot.com/o/util%2Fghost_rights_logo.png?alt=media&token=6ae98b77-6d5e-4980-83d9-4681b4b05cc8'
 
           await db.collection('users')
             .doc(user.uid)
@@ -96,16 +96,20 @@ export default {
               console.error('Error writing document: ', error)
             })
 
-          if (this.$route.params.projectId) {
-            var project = await this.loadProject(this.$route.params.projectId)
-            var scenarioArray = await this.loadScenarioByProjectId(this.$route.params.projectId)
+          await db.collection('writers')
+            .doc(user.uid)
+            .set(userObj)
 
-            await this.copyProject({
-              uid: user.uid,
-              userDisplayName: user.displayName,
-              scenario: scenarioArray,
-              project: project
-            })
+          if (this.$route.params.projectId) {
+            // var project = await this.loadProject(this.$route.params.projectId)
+            // var scenarioArray = await this.loadScenarioByProjectId(this.$route.params.projectId)
+
+            // await this.copyProject({
+            //   uid: user.uid,
+            //   userDisplayName: user.displayName,
+            //   scenario: scenarioArray,
+            //   project: project
+            // })
           }
         }
 
