@@ -49,14 +49,20 @@ export default {
   },
   data () {
     return {
-
+      htmlContent: null
     }
   },
   computed: {
     ...mapStateAuth(['uid'])
   },
-  mounted () {
-    this.$refs.contentHtml.innerHTML = this.content.content
+  async mounted () {
+    this.htmlContent = await db.collection('contents')
+      .doc(this.content.id)
+      .collection('content')
+      .doc('html')
+      .get()
+      .then((d) => { return d.data() })
+    this.$refs.contentHtml.innerHTML = this.htmlContent.content // this.content.content
   },
   methods: {
 

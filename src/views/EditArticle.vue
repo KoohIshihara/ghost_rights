@@ -7,9 +7,10 @@
       @publishContent="publishContent")
     div.wrap-editor
       ModuleEditArticle(
-        v-if="article && content && $route.params.articleId"
+        v-if="article && content && htmlContent && $route.params.articleId"
         :article="article"
         :content="content"
+        :htmlContent="htmlContent"
         @toggleIsSaving="toggleIsSaving")
 
 </template>
@@ -43,6 +44,7 @@ export default {
     return {
       article: null,
       content: null,
+      htmlContent: null,
       isSaving: false
     }
   },
@@ -64,16 +66,31 @@ export default {
         articleTitle: this.article.title,
         articleSubtitle: this.article.subtitle,
         articleId: this.$route.params.articleId,
+        articleOwnerId: this.article.createdAs,
         createdBy: this.uid,
+        createdAs: this.uid,
         createdAt: new Date(),
         updatedAt: new Date(),
         ghost: this.uid,
-        content: '',
+        // content: '',
         isPublished: false
       }
       var contentId = await db.collection('contents').add(contentObj).then((d) => { return d.id })
+
+      this.htmlContent = {
+        createdBy: this.uid,
+        createdAs: this.uid,
+        content: ''
+      }
+      await db.collection('contents')
+        .doc(contentId)
+        .collection('content')
+        .doc('html')
+        .set(this.htmlContent)
+
       this.content = contentObj
       this.content.id = contentId
+
       this.$router.replace(`/edit-article/${this.$route.params.articleId}/${contentId}`)
     } else {
       this.content = await db.collection('contents')
@@ -83,6 +100,15 @@ export default {
           var content = d.data()
           content.id = d.id
           return content
+        })
+
+      this.htmlContent = await db.collection('contents')
+        .doc(this.$route.params.contentId)
+        .collection('content')
+        .doc('html')
+        .get()
+        .then((d) => {
+          return d.data()
         })
     }
   },

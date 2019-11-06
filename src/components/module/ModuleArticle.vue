@@ -80,6 +80,8 @@
             display: inline-block;
             background: #f0f0f0;
             border-radius: 3px;
+            position: relative;
+            left: -4px;
           }
         }
       }
@@ -118,6 +120,17 @@ export default {
       article: null,
       contents: [],
       writer: null
+    }
+  },
+  watch: {
+    contents: function () {
+      this.$nextTick(() => {
+        var positionY = sessionStorage.getItem('positionY')
+        scrollTo(0, positionY)
+        setTimeout(function () {
+          scrollTo(0, positionY)
+        }, 500)
+      })
     }
   },
   async created () {

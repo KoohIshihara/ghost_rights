@@ -1,6 +1,6 @@
 <template lang="pug">
   div.wrap-module-edit-article
-    div.wrap-title.mt20
+    div.wrap-title.mt20.pb20.mb20
       span.article-title {{article.title}}
     div.wrap-article-editor
       div(ref="editable").editable
@@ -17,6 +17,7 @@
   max-width: 640px;
   margin: 0 auto;
   .wrap-title {
+    border-bottom: solid 0.6px rgba(0, 0, 0, 0.2);
     .article-title {
       font-size: 18px;
       font-weight: bold;
@@ -52,9 +53,9 @@ export default {
   },
   data () {
     return {
-      text: '',
-      options: {
-      },
+      // text: '',
+      // options: {
+      // },
       editor: null,
       saveTimer: null
     }
@@ -67,14 +68,13 @@ export default {
     content: {
       type: Object,
       required: true
+    },
+    htmlContent: {
+      type: Object,
+      required: true
     }
   },
   async mounted () {
-    // this.content = await db.collection('contents')
-    //   .doc(this.$route.params.contentId)
-    //   .get()
-    //   .then((d) => { return d.data() })
-
     this.initializeEditor()
   },
   methods: {
@@ -131,22 +131,33 @@ export default {
 
       $(this.$refs.editable).mediumInsert({ editor: this.editor })
 
-      this.editor.setContent(this.content.content, 0)
+      this.editor.setContent(this.htmlContent.content, 0)
+      // this.editor.setContent(this.content.content, 0)
     },
     applyTextEdit () {
       clearTimeout(this.saveTimer)
       this.saveTimer = setTimeout(this.updateContent, 1000)
     },
     async updateContent () {
-      this.content.content = this.editor.getContent()
+      // this.content.content = this.editor.getContent()
+      this.htmlContent.content = this.editor.getContent()
 
       this.$emit('toggleIsSaving')
       await db.collection('contents')
         .doc(this.$route.params.contentId)
         .update({
-          content: this.content.content,
+          // content: this.content.content,
           updatedAt: new Date()
         })
+
+      await db.collection('contents')
+        .doc(this.$route.params.contentId)
+        .collection('content')
+        .doc('html')
+        .update({
+          content: this.htmlContent.content
+        })
+
       this.$emit('toggleIsSaving')
     }
   }

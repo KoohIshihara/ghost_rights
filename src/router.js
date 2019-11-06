@@ -6,6 +6,15 @@ Vue.use(Router)
 export default new Router({
   mode: 'history',
   base: process.env.BASE_URL,
+  scrollBehavior (to, from, savedPosition) {
+    if (savedPosition) {
+      sessionStorage.setItem('positionY', savedPosition.y)
+      return savedPosition
+    } else {
+      sessionStorage.setItem('positionY', 0)
+      return { x: 0, y: 0 }
+    }
+  },
   routes: [
     {
       path: '/',
@@ -32,6 +41,10 @@ export default new Router({
       props: true,
       component: () =>
         import(/* webpackChunkName: "route-SignIn" */ '@/views/Article')
+    },
+    {
+      path: '/@article/:id',
+      redirect: '/article/:id'
     },
     {
       path: '/edit-article/:articleId',

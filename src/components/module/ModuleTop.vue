@@ -1,7 +1,7 @@
 <template lang="pug">
   div(v-if="articles").wrap-module-top
     div.wrap-cards.f.flex-between.flex-wrap.py20
-      ItemArticleCard(v-for="article in articles" :article="article")
+      ItemArticleCard(v-if="articles" v-for="article in articles" :article="article")
 </template>
 
 <style lang="scss">
@@ -26,6 +26,17 @@ export default {
   data () {
     return {
       articles: null
+    }
+  },
+  watch: {
+    articles: function () {
+      this.$nextTick(() => {
+        var positionY = sessionStorage.getItem('positionY')
+        scrollTo(0, positionY)
+        setTimeout(function () {
+          scrollTo(0, positionY)
+        }, 500)
+      })
     }
   },
   async created () {
