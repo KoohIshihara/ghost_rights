@@ -1,16 +1,17 @@
 <template lang="pug">
   Auth(:on-failed-authentication="onFailedAuthentication")
     Header
-    div.wrap-my-page
-      span(@click="logout") Sign Out
+    div.wrap-tmp
+    // ModuleUser
 
 </template>
 
 <style lang="scss">
-.wrap-my-page {
+.wrap-tmp {
   padding-top: 48px;
   width: 92%;
-  max-width: 420px;
+  max-width: 620px;
+  min-height: 100vh;
   margin: 0 auto;
 }
 </style>
@@ -20,27 +21,23 @@ import { createNamespacedHelpers } from 'vuex'
 
 import Auth from '@/components/auth'
 import Header from '@/components/common/Header'
+// import ModuleUser from '@/components/module/ModuleUser'
 const { mapState: mapStateAuth, mapActions: mapActionsAuth } = createNamespacedHelpers('auth')
 
 export default {
   components: {
     Auth,
     Header
+    // ModuleUser
   },
   computed: {
     ...mapStateAuth(['uid', 'isAnonymous'])
   },
-  created () {
-    window.logout = this.logout
+  data () {
+    return {
+    }
   },
   methods: {
-    ...mapActionsAuth(['signOut']),
-    logout () {
-      this.signOut()
-      setTimeout(() => {
-        this.$router.push('/sign-in')
-      }, 400)
-    },
     onFailedAuthentication () {
       this.$router.push('/sign-in')
     }

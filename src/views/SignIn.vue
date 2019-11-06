@@ -4,7 +4,8 @@
       div.sign-ui
         div.f.fc.mb14
           span.welcome Welcome to Ghost Rights
-        SignIn(:redirect="resultRedirect")
+        SignIn
+        // SignIn(:redirect="resultRedirect")
 </template>
 
 <style lang="scss" scoped>
@@ -22,8 +23,7 @@
 
 <script>
 // import firebase from "firebase"
-import db from '@/components/utils/firebase'
-import { firebase } from '@/components/utils/firebase'
+import db, { firebase } from '@/components/utils/firebase'
 
 import { createNamespacedHelpers } from 'vuex'
 
@@ -47,7 +47,7 @@ export default {
     }
   },
   data: () => ({
-    resultRedirect: '/my-page'
+    // resultRedirect: '/my-page'
   }),
   computed: {
     ...mapStateAuth(['isLoggedIn', 'uid', 'isAnonymous'])
@@ -69,19 +69,20 @@ export default {
     },
     async onLoggedIn () {
       if (this.uid && !this.isAnonymous) {
+        var user = await firebase.auth().currentUser
         var userDoc = await db.collection('users').doc(this.uid).get()
 
         if (!userDoc.exists) {
-          var user = await firebase.auth().currentUser
-
           var userObj = {
             uid: user.uid,
+            createdBy: user.uid,
             name: user.displayName,
             // email: user.email,
             profile: 'No Profile',
             iconURL: user.photoURL,
             lastSignInTime: user.metadata.lastSignInTime,
-            createdAt: user.metadata.creationTime
+            createdAt: user.metadata.creationTime,
+            authorized: true
           }
 
           if (!userObj.iconURL) userObj.iconURL = 'https://firebasestorage.googleapis.com/v0/b/ghost-rights.appspot.com/o/util%2Fghost_rights_logo.png?alt=media&token=6ae98b77-6d5e-4980-83d9-4681b4b05cc8'
@@ -96,24 +97,25 @@ export default {
               console.error('Error writing document: ', error)
             })
 
-          await db.collection('writers')
+          await db.collection('users')
             .doc(user.uid)
-            .set(userObj)
+            .collection('secrets')
+            .doc('email')
+            .set({
+              author: user.uid,
+              email: user.email
+            })
 
-          if (this.$route.params.projectId) {
-            // var project = await this.loadProject(this.$route.params.projectId)
-            // var scenarioArray = await this.loadScenarioByProjectId(this.$route.params.projectId)
-
-            // await this.copyProject({
-            //   uid: user.uid,
-            //   userDisplayName: user.displayName,
-            //   scenario: scenarioArray,
-            //   project: project
-            // })
-          }
+          // await db.collection('writers')
+          //   .doc(user.uid)
+          //   .set(userObj)
         }
 
-        this.$router.push(`${this.resultRedirect}`)
+        if (this.$route.params.articleId) {
+          this.$router.push(`/edit-article/${this.$route.params.articleId}`)
+        } else {
+          this.$router.push(`/user/${user.uid}`)
+        }
       } // if (this.uid && !this.isAnonymous) {
     }
   }

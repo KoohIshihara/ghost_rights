@@ -1,17 +1,17 @@
 <template lang="pug">
   Auth(:on-failed-authentication="onFailedAuthentication")
     Header
-    div.wrap-top
-      ModuleTop
+    div.wrap-article
+      ModuleArticle
     Footer
 
 </template>
 
 <style lang="scss">
-.wrap-top {
-  display: block;
+.wrap-article {
+  padding-top: 48px;
+  min-height: 100vh;
   background: #fff;
-  min-height: calc(100vh - 48px);
 }
 </style>
 
@@ -21,7 +21,7 @@ import { createNamespacedHelpers } from 'vuex'
 import Auth from '@/components/auth'
 import Header from '@/components/common/Header'
 import Footer from '@/components/common/Footer'
-import ModuleTop from '@/components/module/ModuleTop'
+import ModuleArticle from '@/components/module/ModuleArticle'
 const { mapState: mapStateAuth, mapActions: mapActionsAuth } = createNamespacedHelpers('auth')
 
 export default {
@@ -29,7 +29,7 @@ export default {
     Auth,
     Header,
     Footer,
-    ModuleTop
+    ModuleArticle
   },
   computed: {
     ...mapStateAuth(['uid', 'isAnonymous'])

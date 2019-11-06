@@ -1,10 +1,5 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Top from './views/Top.vue'
-// import Calendar from './views/Calendar.vue'
-import ArticleSettings from './views/ArticleSettings.vue'
-import MyPage from './views/MyPage.vue'
-import EditArticle from './views/EditArticle.vue'
 
 Vue.use(Router)
 
@@ -15,27 +10,55 @@ export default new Router({
     {
       path: '/',
       name: 'top',
-      component: Top
+      component: () =>
+        import(/* webpackChunkName: "route-SignIn" */ '@/views/Top')
     },
     {
-      path: '/my-page',
-      name: 'my-page',
-      component: MyPage
+      path: '/top',
+      name: 'top',
+      component: () =>
+        import(/* webpackChunkName: "route-SignIn" */ '@/views/Top')
     },
     {
-      path: '/edit-article/:id',
+      path: '/user/:uid',
+      name: 'user',
+      props: true,
+      component: () =>
+        import(/* webpackChunkName: "route-SignIn" */ '@/views/User')
+    },
+    {
+      path: '/article/:id',
+      name: 'article',
+      props: true,
+      component: () =>
+        import(/* webpackChunkName: "route-SignIn" */ '@/views/Article')
+    },
+    {
+      path: '/edit-article/:articleId',
       name: 'edit-article',
-      component: EditArticle
+      props: true,
+      component: () =>
+        import(/* webpackChunkName: "route-SignIn" */ '@/views/EditArticle')
+    },
+    {
+      path: '/edit-article/:articleId/:contentId',
+      name: 'edit-article',
+      props: true,
+      component: () =>
+        import(/* webpackChunkName: "route-SignIn" */ '@/views/EditArticle')
     },
     {
       path: '/article-settings',
       name: 'new-article-settings',
-      component: ArticleSettings
+      component: () =>
+        import(/* webpackChunkName: "route-SignIn" */ '@/views/ArticleSettings')
     },
     {
       path: '/article-settings/:id',
       name: 'article-settings',
-      component: ArticleSettings
+      props: true,
+      component: () =>
+        import(/* webpackChunkName: "route-SignIn" */ '@/views/ArticleSettings')
     },
     {
       path: '/sign-in',
@@ -52,7 +75,14 @@ export default new Router({
         import(/* webpackChunkName: "route-SignIn" */ '@/views/SignIn')
     },
     {
-      path: '/sign-up/:redirect',
+      path: '/sign-in/:articleId',
+      name: 'sign-in-with-redirect',
+      props: true,
+      component: () =>
+        import(/* webpackChunkName: "route-SignIn" */ '@/views/SignIn')
+    },
+    {
+      path: '/sign-up/:articleId',
       name: 'sign-up-with-redirect',
       props: true,
       component: () =>

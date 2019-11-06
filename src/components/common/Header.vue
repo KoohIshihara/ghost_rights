@@ -4,13 +4,14 @@
       div.header-content.f.fh
         div.left.f.fm
           div.wrap-logo.f.fh
-            img(src="/img/logo.svg")
+            span(@click="$router.push('/top')").logo Ghost Right
+            // img(src="/img/logo.svg")
         // span.header-label Label
         div.right.f.fm
           div(v-if="isLoggedIn").f
             span(@click="$router.push('/article-settings')").create-article.px8.pt5.pb4.mr10 Create Article
-            div(@click="$router.push('/my-page')").wrap-icon.f.fh
-              img(:src="user.userIcon")
+            div(@click="$router.push(`/user/${uid}`)").wrap-icon.f.fh
+              img(:src="user.iconURL")
           div(v-if="!isLoggedIn")
             span(@click="$router.push('/sign-in')").sign-in.mr10 Sign In
             span(@click="$router.push('/sign-up')").sign-up.px8.py5 Sign Up
@@ -20,6 +21,7 @@
 <style lang="scss">
 .wrap-header {
   position: fixed;
+  z-index: 101;
   top: 0;
   left: 0;
   width: 100%;
@@ -28,8 +30,8 @@
   border-bottom: solid 0.6px rgba(0, 0, 0, 0.2);
   .header-content {
     position: relative;
-    width: 92%;
-    max-width: 420px;
+    width: 93%;
+    max-width: 620px;
     height: 100%;
     margin: 0 auto;
     .header-label {
@@ -41,7 +43,11 @@
       left: 0;
       height: 100%;
       .wrap-logo {
-        width: 28px;
+        // width: 28px;
+        .logo {
+          font-size: 14px;
+          font-weight: bold;
+        }
       }
     }
     .right {
@@ -61,7 +67,7 @@
         height: 26px;
         border-radius: 50%;
         overflow: hidden;
-        border: solid 0.6px rgba(0, 0, 0, 0.6);
+        border: solid 0.6px rgba(0, 0, 0, 0.4);
         img {
           object-fit: cover;
         }

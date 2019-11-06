@@ -1,19 +1,20 @@
 <template lang="pug">
 
-  div.wrap-media-uploader
+  div.wrap-icon-uploader
     div.uploaded-img.f.fc
       div.img-wrapper.f.fh
         img(v-if="!isUploading" v-show="uploadedImage" :src="uploadedImage")
         v-progress-circular(v-else indeterminate color="#2a2a2a")
-      div(@click="pickImg").wrap-change-icon.f.fh
-        v-icon(color="#fff") cached
+        //span(v-else) Uploading
+      div(@click="pickImg" v-if="enableEdit").wrap-change-icon.f.fh
+        v-icon(color="#fff" size="14") cached
     input(type="file" v-on:change="onFileChange" ref="imgInput" accept="image/*" style="display: none")
     canvas(id="imgCanvas" ref="imgCanvas" width="0" height="0" style="display: none")
 
 </template>
 
 <style lang="scss" scoped>
-.wrap-media-uploader {
+.wrap-icon-uploader {
   width: 100%;
   height: 100%;
   .uploaded-img {
@@ -24,7 +25,9 @@
     .img-wrapper {
       width: 100%;
       height: 100%;
-      min-height: 232px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: solid 0.6px rgba(0, 0, 0, 0.2);
       img {
         object-fit: cover;
         min-height: 100%;
@@ -33,10 +36,10 @@
     }
     .wrap-change-icon {
       position: absolute;
-      width: 30px;
-      height: 30px;
-      right: 8px;
-      bottom: 8px;
+      width: 24px;
+      height: 24px;
+      right: 2px;
+      bottom: 2px;
       cursor: pointer;
       background: #2a2a2a;
       border-radius: 50%;
@@ -64,6 +67,10 @@ export default {
     imgId: {
       type: String,
       required: true
+    },
+    enableEdit: {
+      type: Boolean,
+      required: false
     }
   },
   data () {
@@ -74,7 +81,6 @@ export default {
     }
   },
   created () {
-    console.log('strage', strage)
     if (this.existingImg) this.uploadedImage = this.existingImg
   },
   methods: {
@@ -126,8 +132,8 @@ export default {
     // アップロードした画像を表示
     createImage (file) {
       // 画像リサイズ後の最大値の幅
-      const THUMBNAIL_WIDTH = 1200
-      const THUMBNAIL_HEIGHT = 800
+      const THUMBNAIL_WIDTH = 240
+      const THUMBNAIL_HEIGHT = 240
 
       var imgCanvas = this.$refs.imgCanvas
 

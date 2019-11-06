@@ -5,8 +5,11 @@
         div.left.f.fm
           div.wrap-logo.f.fh
             v-icon(@click="$router.go(-1)" color="#2a2a2a") arrow_back_ios
-        // span.header-label Label
+            span(v-if="!isSaving") Saved
+            span(v-if="isSaving") Saving...
         div.right.f.fm
+          span(v-if="!content.isPublished" @click="$emit('publishContent')").button-publish.px8.py5 Publish
+          span(v-if="content.isPublished").published Published
 
 </template>
 
@@ -39,6 +42,15 @@
       position: absolute;
       right: 0;
       height: 100%;
+      .button-publish {
+        font-size: 12px;
+        font-weight: 500;
+        color: #fff;
+        background: #2a2a2a;
+        border-radius: 3px;
+        letter-spacing: 0.6px;
+        cursor: pointer;
+      }
     }
   }
 }
@@ -47,9 +59,25 @@
 <script>
 import Auth from '@/components/auth'
 
+import { createNamespacedHelpers } from 'vuex'
+const { mapState: mapStateAuth } = createNamespacedHelpers('auth')
+
 export default {
   components: {
     Auth
+  },
+  computed: {
+    ...mapStateAuth(['uid'])
+  },
+  props: {
+    content: {
+      type: Object,
+      required: true
+    },
+    isSaving: {
+      type: Boolean,
+      required: true
+    }
   }
 }
 </script>

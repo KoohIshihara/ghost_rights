@@ -1,29 +1,40 @@
 <template lang="pug">
-  div.wrap-item-writer-info.f.fm.py10
-    div.wrap-icon.f.fh.mr12
-      img(:src="user.iconURL")
-    div.wrap-profile
+  div.wrap-item-writer-info.f.fm.py20
+    div(:class="{'enable-to-edit': enableEdit}").wrap-icon.f.fh
+      AtomIconUploader(
+        v-if="docId && existingMainImg"
+        :imgId="docId"
+        :existingImg="existingMainImg"
+        :enableEdit="enableEdit"
+        ref="mediaUploader")
+    div.wrap-profile.pl12
       div.wrap-name.f.fm.flex-between
-        //span.name.mr12 {{user.name}}
-        input(:value="user.name").name.mr12
-        span.edit-button.px6.py5 Edit profile
-      textarea(:value="user.profile").profile
-      //span.profile {{user.profile}}
+        input(
+          ref="nameInput"
+          v-model="nameText"
+          :class="{'enable-to-edit': enableEdit}").name.mr12.mb4
+        div(v-if="uid === profileUid")
+          span(@click="onEdit" v-if="!enableEdit").edit-button.px7.py3 Edit
+          span(@click="onSave" v-if="enableEdit").save-button.px7.py3 Save
+      div.wrap-profile
+        textarea(
+          ref="profileText"
+          v-model="profileText"
+          :style="profileStyle"
+          :class="{'enable-to-edit': enableEdit}").profile
+        span(ref="hiddenProfileText").profile-hidden {{profileText}}
 
 </template>
 
 <style lang="scss">
 .wrap-item-writer-info {
   .wrap-icon {
-    width: 120px;
-    height: 120px;
+    width: 80px;
+    height: 80px;
     border-radius: 50%;
-    overflow: hidden;
-    img {
-      object-fit: cover;
-    }
   }
   .wrap-profile {
+    width: calc(100% - 80px);
     span {
       display: block;
     }
@@ -31,6 +42,12 @@
       width: 100%;
       .name {
         font-size: 16px;
+        pointer-events: none;
+        outline: none;
+        &.enable-to-edit {
+          color: #1a73e8;
+          pointer-events: auto !important;
+        }
       }
       .edit-button {
         border: solid 0.6px #2a2a2a;
@@ -38,11 +55,42 @@
         cursor: pointer;
         font-size: 12px;
       }
+      .save-button {
+        border: solid 0.6px #2a2a2a;
+        border-radius: 3px;
+        cursor: pointer;
+        font-size: 12px;
+        background: #2a2a2a;
+        color: #fff;
+      }
     }
-    .profile {
-      font-size: 14px;
-      color: #999;
-      resize: none;
+    .wrap-profile {
+      position: relative;
+      width: 100%;
+      .profile {
+        width: 100%;
+        font-size: 12px;
+        color: #999;
+        resize: none;
+        pointer-events: none;
+        &.enable-to-edit {
+          color: #1a73e8;
+          pointer-events: auto !important;
+        }
+      }
+      .profile-hidden {
+        visibility: hidden;
+        position: absolute;
+        left: 0;
+        top: 0;
+        min-height: 18px;
+        font-size: 12px;
+        display: inline-block;
+        pointer-events: none;
+        font-family: BlinkMacSystemFont, -apple-system, Segoe UI, Roboto, Oxygen,
+          Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, Helvetica,
+          Arial, sans-serif;
+      }
     }
   }
 }
@@ -50,26 +98,76 @@
 
 <script>
 import db from '@/components/utils/firebase'
+import AtomIconUploader from '@/components/atom/AtomIconUploader'
+
+import { createNamespacedHelpers } from 'vuex'
+const { mapState: mapStateAuth } = createNamespacedHelpers('auth')
 
 export default {
+  components: {
+    AtomIconUploader
+  },
   props: {
-    uid: {
+    profileUid: {
       type: String,
       default: ''
     }
   },
   data () {
     return {
-      user: {}
+      user: {},
+      docId: '',
+      existingMainImg: '',
+      nameText: '',
+      profileText: '',
+      profileStyle: '',
+      enableEdit: false
+    }
+  },
+  computed: {
+    ...mapStateAuth(['uid'])
+  },
+  watch: {
+    profileText (value) {
+      this.adjestProfileTextareaSize()
     }
   },
   async created () {
-    this.user = await db.collection('users').doc(this.uid).get()
+    this.user = await db.collection('users').doc(this.profileUid).get()
       .then((q) => {
         var user = q.data()
         user.uid = q.id
         return user
       })
+
+    this.docId = this.user.uid
+    this.existingMainImg = this.user.iconURL
+
+    this.nameText = this.user.name
+    this.profileText = this.user.profile
+  },
+  mounted () {
+    this.$nextTick(this.adjestProfileTextareaSize)
+    // setTimeout(this.adjestProfileTextareaSize, 800)
+  },
+  methods: {
+    adjestProfileTextareaSize () {
+      var h = this.$refs.hiddenProfileText.offsetHeight
+      this.profileStyle = `height: ${h}px;`
+    },
+    onEdit () {
+      this.enableEdit = true
+      this.$refs.nameInput.focus()
+    },
+    async onSave () {
+      await db.collection('users').doc(this.uid)
+        .update({
+          name: this.nameText,
+          profile: this.profileText,
+          iconURL: this.$refs.mediaUploader.getImgUrl()
+        })
+      this.enableEdit = false
+    }
   }
 }
 </script>
