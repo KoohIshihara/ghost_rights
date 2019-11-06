@@ -29,12 +29,12 @@ exports.updatedPublishStatusOfContent = functions.firestore
     const newContent = change.after.data()
     const previousContent = change.before.data()
     
-    console.log('updated content', newContent)
-
     if (newContent.isPublished && !previousContent.isPublished) {
       var email = await db.collection('users').doc(newContent.articleOwnerId)
         .collection('secrets').doc('email')
         .get().then((d) => { return d.data().email })
+
+      console.log(`send mail to ${email}`)
 
       var subject = 'Somebody has written your article as your ghost.'
       var text = `Let's check your article. Your article has been updated by your ghost writer. \n\n https://ghostright.io/article/${newContent.articleId}`
@@ -42,28 +42,19 @@ exports.updatedPublishStatusOfContent = functions.firestore
     }
   })
 
-// exports.createRoom = functions.firestore
-//   .document(`teams/{teamId}/rooms/{roomId}`)
-//   .onCreate(async (doc, context) => {
-//     console.log('createRoom', doc.data())
-//     var room = doc.data()
-//     await db.collection('teams').doc(room.teamId).update({
-//       roomNum: FieldValue.increment(1)
-//     })
-//     var team = await db.collection('teams')
-//       .doc(room.teamId)
-//       .get()
-//       .then((d) => {
-//         var team = d.data()
-//         team.id = d.id
-//         return team
-//       })
 
-//     var email = await db.collection('users').doc(team.author)
-//       .collection('secrets').doc('email')
-//       .get().then((d) => { return d.data().email })
+// OGP Redirect
+exports.articleRedirect = functions.https.onRequest(async (req, res) => {
+  cors(req, res, async () => {
+    const articleId = req.path.split('/')[2]
 
-//     var subject = '[Chatcenter.Ai] ボットにアクセスがありました。'
-//     var text = `誰かがあなたのボットにアクセスしました。\n\n https://chatcenter-min-ui.firebaseapp.com/profile/${team.id}/${doc.id}`
-//     mailSender(email, subject, text)
-//   })
+    var article = await db.collection("articles")
+      .doc(articleId)
+      .get()
+      .then((d) => { return d.data() })
+
+    const html = createHTML(article.title, article.subtitle, article.mainImg, articleId)
+    res.set('Cache-Control', 'public, max-age=600, s-maxage=600')
+    res.status(200).end(html)
+  }) // cors
+})

@@ -1,7 +1,6 @@
 const nodemailer = require('nodemailer')
 const gmailEmail = 'ghostright.io.hack@gmail.com'
-const gmailPassword = 'ramen55ramen55'
-// const adminEmail = 'hello@appsocial.ly'
+const gmailPassword = ''
 
 const mailTransport = nodemailer.createTransport({
   service: 'gmail',
