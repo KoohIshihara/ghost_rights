@@ -54,6 +54,9 @@ exports.articleRedirect = functions.https.onRequest(async (req, res) => {
       .then((d) => { return d.data() })
 
     const html = createHTML(article.title, article.subtitle, article.mainImg, articleId)
+
+    console.log("html:::", html)
+
     res.set('Cache-Control', 'public, max-age=600, s-maxage=600')
     res.status(200).end(html)
   }) // cors

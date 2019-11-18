@@ -14,8 +14,9 @@
           div.f.fm
             img(src="/icon/icon-twitter.svg").icon.mr6
             span Share with Twitter
-        a(v-clipboard:copy="link" v-clipboard:success="onCopyLink").share-button.f.fc.flex-around.px10.py8
+        a(v-clipboard:copy="link" v-clipboard:success="onCopyLink").share-button.f.fc.flex-around.px10.py8.mb20
           span Copy Article Link
+        span(@click="hideModal").ok OK
     div(@click="hideModal").overlay
 
 </template>
@@ -56,6 +57,10 @@
         span {
           color: #2a2a2a;
         }
+      }
+      .ok {
+        display: block;
+        text-align: center;
       }
     }
   }
@@ -101,7 +106,7 @@ export default {
       alert('Your link has been copied.')
     },
     hideModal () {
-      this.$emit('toggleShowModal')
+      this.$emit('toggleShowRecommendationShareModal')
       this.$router.push(`/article/${this.docId}`)
     }
   }

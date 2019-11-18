@@ -1,8 +1,19 @@
 <template lang="pug">
   div.wrap-article-settings
     HeaderModal
-    ModuleArticleSettings(:newDocId="newDocId" @toggleShowModal="toggleShowModal")
-    ModuleModalRecommendShare(v-if="showModal" :newDocId="newDocId" @toggleShowModal="toggleShowModal")
+    ModuleArticleSettings(
+      ref="moduleArticleSettings"
+      :newDocId="newDocId"
+      @toggleShowRecommendationShareModal="toggleShowRecommendationShareModal"
+      @toggleShowSelectWriterModal="toggleShowSelectWriterModal")
+    ModuleModalRecommendShare(
+      v-if="showRecommendationShareModal"
+      :newDocId="newDocId"
+      @toggleShowRecommendationShareModal="toggleShowRecommendationShareModal")
+    ModuleModalSelectWriter(
+      v-if="showSelectWriterModal"
+      @toggleShowSelectWriterModal="toggleShowSelectWriterModal"
+      @changeWriter="changeWriter")
 
 </template>
 
@@ -16,16 +27,19 @@
 import HeaderModal from '@/components/common/HeaderModal'
 import ModuleArticleSettings from '@/components/module/ModuleArticleSettings'
 import ModuleModalRecommendShare from '@/components/module/ModuleModalRecommendShare'
+import ModuleModalSelectWriter from '@/components/module/ModuleModalSelectWriter'
 
 export default {
   components: {
     HeaderModal,
     ModuleArticleSettings,
-    ModuleModalRecommendShare
+    ModuleModalRecommendShare,
+    ModuleModalSelectWriter
   },
   data () {
     return {
-      showModal: false
+      showRecommendationShareModal: false,
+      showSelectWriterModal: false
     }
   },
   computed: {
@@ -39,8 +53,14 @@ export default {
     }
   },
   methods: {
-    toggleShowModal () {
-      this.showModal = !this.showModal
+    toggleShowRecommendationShareModal () {
+      this.showRecommendationShareModal = !this.showRecommendationShareModal
+    },
+    toggleShowSelectWriterModal () {
+      this.showSelectWriterModal = !this.showSelectWriterModal
+    },
+    changeWriter (uid) {
+      this.$refs.moduleArticleSettings.changeWriter(uid)
     }
   }
 }

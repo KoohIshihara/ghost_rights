@@ -1,28 +1,37 @@
 <template lang="pug">
-  div.wrap-item-writer-info.f.fm.py20
-    div(:class="{'enable-to-edit': enableEdit}").wrap-icon.f.fh
-      AtomIconUploader(
-        v-if="docId && existingMainImg"
-        :imgId="docId"
-        :existingImg="existingMainImg"
-        :enableEdit="enableEdit"
-        ref="mediaUploader")
-    div.wrap-profile.pl12
-      div.wrap-name.f.fm.flex-between
-        input(
-          ref="nameInput"
-          v-model="nameText"
-          :class="{'enable-to-edit': enableEdit}").name.mr12.mb4
-        div(v-if="uid === profileUid")
-          span(@click="onEdit" v-if="!enableEdit").edit-button.px7.py3 Edit
-          span(@click="onSave" v-if="enableEdit").save-button.px7.py3 Save
-      div.wrap-profile
-        textarea(
-          ref="profileText"
-          v-model="profileText"
-          :style="profileStyle"
-          :class="{'enable-to-edit': enableEdit}").profile
-        span(ref="hiddenProfileText").profile-hidden {{profileText}}
+  div.wrap-item-writer-info
+    div(v-if="user.uid === this.uid").f.fm.py16
+      div(:class="{'enable-to-edit': enableEdit}").wrap-icon.f.fh
+        AtomIconUploader(
+          v-if="docId && existingMainImg"
+          :imgId="docId"
+          :existingImg="existingMainImg"
+          :enableEdit="enableEdit"
+          ref="mediaUploader")
+      div.wrap-profile.pl12
+        div.wrap-name.f.fm.flex-between
+          input(
+            ref="nameInput"
+            v-model="nameText"
+            :class="{'enable-to-edit': enableEdit}").name.mr12.mb4
+          div(v-if="uid === profileUid")
+            span(@click="onEdit" v-if="!enableEdit").edit-button.px7.py3 Edit
+            span(@click="onSave" v-if="enableEdit").save-button.px7.py3 Save
+        div.wrap-profile
+          textarea(
+            ref="profileText"
+            v-model="profileText"
+            :style="profileStyle"
+            :class="{'enable-to-edit': enableEdit}").profile
+          span(ref="hiddenProfileText").profile-hidden {{profileText}}
+    div(v-else).wrap-another-user-profile.f.fm.py20
+      div.wrap-icon.f.fh
+        img(:src="user.iconURL")
+      div.wrap-profile.pl12
+        span.name {{user.name}}
+        span.profile {{user.profile}}
+    div(v-if="this.$route.name === 'user' || this.$route.name === 'article'").wrap-create-article-as-this-writer.f.fc.mb20
+      span(@click="$router.push(`/article-settings/new/${user.uid}`)").px8.py4 {{`Create Article as ${user.name}`}}
 
 </template>
 
@@ -93,6 +102,31 @@
       }
     }
   }
+  .wrap-another-user-profile {
+    .wrap-icon {
+      overflow: hidden;
+    }
+    .wrap-profile {
+      display: block;
+      .name {
+        font-size: 16px;
+      }
+      .profile {
+        font-size: 12px;
+        color: #999;
+      }
+    }
+  }
+  .wrap-create-article-as-this-writer {
+    span {
+      display: inline-block;
+      background: #2a2a2a;
+      border-radius: 3px;
+      color: #fff;
+      cursor: pointer;
+      font-size: 12px;
+    }
+  }
 }
 </style>
 
@@ -134,9 +168,9 @@ export default {
   },
   async created () {
     this.user = await db.collection('users').doc(this.profileUid).get()
-      .then((q) => {
-        var user = q.data()
-        user.uid = q.id
+      .then((d) => {
+        var user = d.data()
+        user.uid = d.id
         return user
       })
 
@@ -152,8 +186,10 @@ export default {
   },
   methods: {
     adjestProfileTextareaSize () {
-      var h = this.$refs.hiddenProfileText.offsetHeight
-      this.profileStyle = `height: ${h}px;`
+      if (this.$refs.hiddenProfileText) {
+        var h = this.$refs.hiddenProfileText.offsetHeight
+        this.profileStyle = `height: ${h}px;`
+      }
     },
     onEdit () {
       this.enableEdit = true
@@ -167,6 +203,21 @@ export default {
           iconURL: this.$refs.mediaUploader.getImgUrl()
         })
       this.enableEdit = false
+    },
+    // This func is called by parent component
+    async reloadWriter (uid) {
+      this.user = await db.collection('users').doc(uid).get()
+        .then((d) => {
+          var user = d.data()
+          user.uid = d.id
+          return user
+        })
+
+      this.docId = this.user.uid
+      this.existingMainImg = this.user.iconURL
+
+      this.nameText = this.user.name
+      this.profileText = this.user.profile
     }
   }
 }

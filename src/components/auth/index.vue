@@ -35,7 +35,6 @@ export default {
   },
   created () {
     this.setupAuthStateHandler()
-
     // Check our auth status when we first start rendering
     this.checkAuthStatus(this.isAuthenticating, this.isLoggedIn)
   },

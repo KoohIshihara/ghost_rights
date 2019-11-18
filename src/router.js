@@ -60,14 +60,21 @@ export default new Router({
       component: () =>
         import(/* webpackChunkName: "route-SignIn" */ '@/views/EditArticle')
     },
+    // {
+    //   path: '/article-settings',
+    //   name: 'new-article-settings',
+    //   component: () =>
+    //     import(/* webpackChunkName: "route-SignIn" */ '@/views/ArticleSettings')
+    // },
     {
-      path: '/article-settings',
-      name: 'new-article-settings',
+      path: '/article-settings/:articleId',
+      name: 'article-settings',
+      props: true,
       component: () =>
         import(/* webpackChunkName: "route-SignIn" */ '@/views/ArticleSettings')
     },
     {
-      path: '/article-settings/:id',
+      path: '/article-settings/:articleId/:writerId',
       name: 'article-settings',
       props: true,
       component: () =>

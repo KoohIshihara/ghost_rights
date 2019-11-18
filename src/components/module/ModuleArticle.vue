@@ -37,6 +37,8 @@
   margin: 0 auto;
   .wrap-main-img {
     width: 100%;
+    max-height: 380px;
+    overflow: hidden;
     img {
       object-fit: cover;
     }

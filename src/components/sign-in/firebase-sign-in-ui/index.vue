@@ -35,7 +35,12 @@ export default {
           signInSuccess: () => false
         },
         signInOptions: [
+          // a6dcc223f0d35cec5de1446b753ba1b9
           // Leave the lines as is for the providers you want to offer your users.
+          {
+            provider: firebase.auth.FacebookAuthProvider.PROVIDER_ID,
+            requireDisplayName: true
+          },
           {
             provider: firebase.auth.EmailAuthProvider.PROVIDER_ID,
             requireDisplayName: true

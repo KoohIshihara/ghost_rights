@@ -9,7 +9,7 @@
         // span.header-label Label
         div.right.f.fm
           div(v-if="isLoggedIn").f
-            span(@click="$router.push('/article-settings')").create-article.px8.pt5.pb4.mr10 Create Article
+            span(@click="$router.push('/article-settings/new')").create-article.px8.pt5.pb4.mr10 Create Article
             div(@click="$router.push(`/user/${uid}`)").wrap-icon.f.fh
               img(:src="user.iconURL")
           div(v-if="!isLoggedIn")

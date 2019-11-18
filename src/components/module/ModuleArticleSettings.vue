@@ -16,9 +16,13 @@
       h3 Comment for Ghost Writer:
       textarea(placeholder="Type comment here." ref="commentForGhostInput")
     div.wrap-writer.mb20
-      h3 Writer:
+      div.f.flex-between
+        h3 Written as:
+        div(@click="$emit('toggleShowSelectWriterModal')").change-writer-button.f.fm.px6.py4
+          v-icon(color="#fff" size="16px").mr4 cached
+          span Change Writer
       div.wrap-writer-info
-        ItemWriterInfo(v-if="uid" :profileUid="uid")
+        ItemWriterInfo(v-if="writerId" :profileUid="writerId" ref="itemWriterInfo")
     div.wrap-publish-button.f.fc
       span(@click="publish").publish-button.px12.py6 PUBLISH
 
@@ -49,6 +53,18 @@
       outline: none;
       resize: none;
       border-bottom: solid #2a2a2a 1px;
+    }
+  }
+  .wrap-writer {
+    .change-writer-button {
+      background: #2a2a2a;
+      border-radius: 3px;
+      color: #fff;
+      cursor: pointer;
+      span {
+        font-size: 12px;
+        letter-spacing: 0.6px;
+      }
     }
   }
   .wrap-publish-button {
@@ -84,6 +100,7 @@ export default {
   data () {
     return {
       docId: '',
+      writerId: '',
       existingMainImg: ''
     }
   },
@@ -98,7 +115,8 @@ export default {
   },
   created () {
     if (this.existingMainImg === '') this.existingMainImg = 'https://firebasestorage.googleapis.com/v0/b/ghost-rights.appspot.com/o/util%2Fghost_rights_no_image.png?alt=media&token=2610829b-7d51-49a6-b225-13ba9bab6244'
-    this.docId = !(this.$route.params.id) ? this.newDocId : this.$route.params.id
+    this.docId = (this.$route.params.articleId === 'new') ? this.newDocId : this.$route.params.id
+    this.writerId = !(this.$route.params.writerId) ? this.uid : this.$route.params.writerId
     // this.docId = !(this.$route.params.id) ? this.createNewDocId() : this.$route.params.id // this.id
   },
   methods: {
@@ -129,27 +147,19 @@ export default {
         createdBy: this.uid,
         createdAt: new Date(),
         updatedAt: new Date(),
-        createdAs: this.uid,
+        createdAs: this.writerId,
         commentForGhost: commentForGhost,
         isPublished: true,
         ghosts: []
       }
 
       await db.collection('articles').doc(this.docId).set(articleObj)
-      this.$emit('toggleShowModal')
-
-      console.log('Recomend Share')
+      this.$emit('toggleShowRecommendationShareModal')
+    },
+    changeWriter (uid) {
+      this.writerId = uid
+      this.$refs.itemWriterInfo.reloadWriter(uid)
     }
-    // createNewDocId () {
-    //   var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-    //   var autoId = ''
-    //   for (let i = 0; i < 20; i++) {
-    //     autoId += chars.charAt(Math.floor(Math.random() * chars.length))
-    //   }
-    //   // var doc = await db.collection('articles').doc(autoId).get()
-    //   // if (doc.exists) this.createNewDocId()
-    //   return autoId
-    // }
   }
 }
 </script>

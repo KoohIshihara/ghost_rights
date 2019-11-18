@@ -13,14 +13,24 @@ import 'firebase/auth'
 //   messagingSenderId: process.env.VUE_APP_FIREBASE_MESSAGINGSENDERID
 // }
 
+// for Dev
 var config = {
-  apiKey: 'AIzaSyA0cJ4YGvhiN_BX9dsV2Pm8nSSF-qY98Ww',
-  authDomain: 'ghost-rights.firebaseapp.com',
-  databaseURL: 'https://ghost-rights.firebaseio.com',
-  projectId: 'ghost-rights',
-  storageBucket: 'ghost-rights.appspot.com',
-  messagingSenderId: '483501591562'
+  apiKey: 'AIzaSyCjIaXF7ZRGK0YWp_HJq4chXQ3jWqD46FU',
+  authDomain: 'ghost-right-dev.firebaseapp.com',
+  databaseURL: 'https://ghost-right-dev.firebaseio.com',
+  projectId: 'ghost-right-dev',
+  storageBucket: 'ghost-right-dev.appspot.com',
+  messagingSenderId: '307155485013'
 }
+
+// var config = {
+//   apiKey: 'AIzaSyA0cJ4YGvhiN_BX9dsV2Pm8nSSF-qY98Ww',
+//   authDomain: 'ghost-rights.firebaseapp.com',
+//   databaseURL: 'https://ghost-rights.firebaseio.com',
+//   projectId: 'ghost-rights',
+//   storageBucket: 'ghost-rights.appspot.com',
+//   messagingSenderId: '483501591562'
+// }
 
 const firebaseApp = firebase.initializeApp(config)
 

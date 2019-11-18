@@ -25,6 +25,8 @@
       width: 100%;
       height: 100%;
       min-height: 232px;
+      max-height: 272px;
+      overflow: hidden;
       img {
         object-fit: cover;
         min-height: 100%;

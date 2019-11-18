@@ -15,7 +15,9 @@
   width: 49%;
   cursor: pointer;
   .wrap-img {
-    min-height: 160px;
+    height: 160px;
+    overflow: hidden;
+    //  min-height: 160px;
     // border: solid 0.6px rgba(150, 150, 150, 0.2);
     img {
       object-fit: cover;

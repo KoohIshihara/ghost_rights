@@ -10,10 +10,11 @@ module.exports = (title, subtitle, src, articleId) => {
   const DESCRIPTION = subtitle
   return `<!DOCTYPE html>
 <html>
-  <head>
+  <head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# article: http://ogp.me/ns/article#">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <title>${TITLE}</title>
+    <meta property="fb:app_id" content="1385467428297550"/>
     <meta property="og:title" content="${TITLE}">
     <meta property="og:image" content="${src}">
     <meta property="og:image:width" content="${OGP_IMG_WIDTH}">
@@ -29,7 +30,9 @@ module.exports = (title, subtitle, src, articleId) => {
     <meta name="twitter:description" content="${DESCRIPTION}">
   </head>
   <body>
-    <script type="text/javascript">window.location="/@article/${articleId}"</script>
+    <script type="text/javascript">
+      window.location.href="/@article/${articleId}/";
+    </script>
   </body>
 </html>
 `

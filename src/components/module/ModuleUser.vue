@@ -7,11 +7,14 @@
         v-for="item in tabs"
         :class="{'active': item.show}"
         @click="onTab(item.id)").tab-button.mr14.pb8 {{item.label}}
-    div(v-if="tabs[0].show").wrap-user-content-cards.pt12
-      div(v-if="contents" v-for="item in contents").mb8
-        ItemUserContentCard(:content="item")
-    div(v-if="tabs[1].show").wrap-user-article-cards.f.flex-between.flex-wrap.pt12
-      ItemArticleCard(v-if="articles" v-for="item in articles" :article="item")
+    div(v-for="tab in tabs").tab-content
+      div.pt12
+        div(v-if="tab.show && tab.id === 'ghost_contents'")
+          div(v-for="item in contents").wrap-card.mb8
+            ItemUserContentCard(:content="item")
+        div(v-if="tab.show && tab.id === 'articles'")
+          div(v-for="item in articles").wrap-card
+            ItemArticleCard(:article="item")
 
 </template>
 
@@ -63,7 +66,7 @@ export default {
       contents: null,
       articles: null,
       tabs: [
-        { label: 'Ghost Contents', id: 'ghost_id', show: true },
+        { label: 'Ghost Contents', id: 'ghost_contents', show: true },
         { label: 'Articles', id: 'articles', show: false }
       ]
     }
@@ -72,10 +75,10 @@ export default {
     ...mapStateAuth(['uid'])
   },
   async created () {
-    if (this.$route.params.uid !== this.uid) this.tabs = [{ label: 'Articles', id: 'articles', show: false }]
+    if (this.$route.params.uid !== this.uid) this.tabs = [{ label: 'Articles', id: 'articles', show: true }]
 
     this.contents = await db.collection('contents')
-      .where('createdBy', '==', this.uid)
+      .where('createdBy', '==', this.$route.params.uid)
       .orderBy('updatedAt', 'desc')
       .get()
       .then((q) => {
@@ -87,7 +90,7 @@ export default {
       })
 
     this.articles = await db.collection('articles')
-      .where('createdAs', '==', this.uid)
+      .where('createdAs', '==', this.$route.params.uid)
       .orderBy('updatedAt', 'desc')
       .get()
       .then((q) => {
