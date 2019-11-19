@@ -188,7 +188,7 @@ export default {
       }
       reader.readAsDataURL(file)
     },
-    uploadImg () {
+    async uploadImg () {
       var base64 = this.$refs.imgCanvas.toDataURL()
 
       // this.uploadedImage = base64
@@ -196,17 +196,20 @@ export default {
       // ストレージオブジェクト作成
       var storageRef = strage.ref()
       // ファイルのパスを設定
-      var mountainsRef = storageRef.child(`articles/${this.imgId}.jpg`)
+      var imgRef = storageRef.child(`articles/${this.imgId}.jpg`)
       // ファイルを適用してファイルアップロード開始
-      // mountainsRef.put(this.imageFile).then(snapshot => {
-      mountainsRef.putString(base64.split(',')[1], 'base64').then(snapshot => {
-        snapshot.ref.getDownloadURL().then(downloadURL => {
+      //  imgRef.put(this.imageFile).then(snapshot => {
+      var imgUrl = await imgRef.putString(base64.split(',')[1], 'base64').then(async (snapshot) => {
+        var url = await snapshot.ref.getDownloadURL().then(async (downloadURL) => {
           this.isUploading = false
           this.uploadedImage = downloadURL
           this.$emit('updateNodeContent', this.uploadedImage)
           console.log('imageUrl', downloadURL)
+          return downloadURL
         })
+        return url
       })
+      console.log('imgUrl:', imgUrl)
     },
     getImgUrl () {
       return this.uploadedImage

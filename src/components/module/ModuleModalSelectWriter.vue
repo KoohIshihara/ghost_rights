@@ -12,11 +12,12 @@
           input(placeholder="Type name" v-model="searchWord").pl2.pr4
       div.wrap-result
         div(v-for="item in resultUsers" @click="onCard(item.uid)").wrap-result-card.py6
-          div.card-content.f.fm.flex-between
-            div.f.fm
-              div.wrap-icon.mr8
-                img(:src="item.iconURL")
+          div.card-content.f.fm
+            div.wrap-icon.mr8
+              img(:src="item.iconURL")
+            div.wrap-profile
               span.name {{item.name}}
+              span.profile.line-clamp-1 {{item.profile}}
 
 </template>
 
@@ -79,6 +80,13 @@
               object-fit: cover;
             }
           }
+          .wrap-profile {
+            max-width: calc(100% - 54px);
+            .profile {
+              font-size: 12px;
+              color: #999;
+            }
+          }
         }
       }
     }
@@ -98,12 +106,13 @@ export default {
     return {
       searchWord: '',
       isSearching: false,
-      resultUsers: []
+      resultUsers: [],
+      anonymousUser: null
     }
   },
   watch: {
     searchWord: async function (name) {
-      if (!this.isSearching) {
+      if (!this.isSearching && name !== '') {
         this.isSearching = true
         this.resultUsers = await db.collection('users')
           .limit(100)
@@ -120,21 +129,38 @@ export default {
           })
         this.isSearching = false
       }
+
+      if (name === '') this.initialize()
     }
   },
-  async created () {
-    this.resultUsers = await db.collection('users')
-      .limit(100)
-      .get()
-      .then((q) => {
-        return q.docs.map((d) => {
+  created () {
+    this.initialize()
+  },
+  methods: {
+    async initialize () {
+      this.anonymousUser = await db.collection('users')
+        .doc('anonymous')
+        .get()
+        .then((d) => {
           var user = d.data()
           user.uid = d.id
           return user
         })
-      })
-  },
-  methods: {
+
+      var users = await db.collection('users')
+        .limit(100)
+        .get()
+        .then((q) => {
+          var users = q.docs.map((d) => {
+            var user = d.data()
+            user.uid = d.id
+            return user
+          })
+          return users.filter((e) => { return (e.uid !== 'anonymous') })
+        })
+
+      this.resultUsers = [this.anonymousUser].concat(users)
+    },
     onCard (uid) {
       this.$emit('changeWriter', uid)
       this.$emit('toggleShowSelectWriterModal')

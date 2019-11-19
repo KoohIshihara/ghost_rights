@@ -44,7 +44,7 @@
 // console.log('editor:', editor.MediumEditor.Extension.extend({
 //   name: 'placeholder'
 // }))
-import db from '@/components/utils/firebase'
+import db, { strage } from '@/components/utils/firebase'
 
 export default {
   components: {
@@ -139,10 +139,12 @@ export default {
       this.saveTimer = setTimeout(this.updateContent, 1000)
     },
     async updateContent () {
-      // this.content.content = this.editor.getContent()
+      this.$emit('toggleIsSaving')
+
+      await this.adjustImgSize()
+
       this.htmlContent.content = this.editor.getContent()
 
-      this.$emit('toggleIsSaving')
       await db.collection('contents')
         .doc(this.$route.params.contentId)
         .update({
@@ -159,6 +161,92 @@ export default {
         })
 
       this.$emit('toggleIsSaving')
+    },
+    async adjustImgSize () {
+      return new Promise(async (resolve, reject) => {
+        // 画像リサイズ後の最大値の幅
+        const THUMBNAIL_WIDTH = 600
+        const THUMBNAIL_HEIGHT = 400
+
+        var imgs = this.$refs.editable.getElementsByTagName('img')
+
+        var w, h, ratio, rw, rh
+
+        var loadImage = (src) => {
+          return new Promise((resolve, reject) => {
+            const img = new Image()
+            img.onload = () => resolve(img)
+            img.onerror = (e) => reject(e)
+            img.src = src
+          })
+        }
+
+        for (var i = 0; i < imgs.length; i++) {
+          var image = await loadImage(imgs[i].src)
+          w = image.width
+          h = image.height
+          if (w >= THUMBNAIL_WIDTH || h >= THUMBNAIL_HEIGHT) {
+            if (w > h) {
+              // 横長の画像は横のサイズを指定値にあわせる
+              ratio = h / w
+              rw = THUMBNAIL_WIDTH
+              rh = THUMBNAIL_WIDTH * ratio
+            } else {
+              // 縦長の画像は縦のサイズを指定値にあわせる
+              ratio = w / h
+              rw = THUMBNAIL_HEIGHT * ratio
+              rh = THUMBNAIL_HEIGHT
+            }
+
+            var imgB64_src = imgs[i].src
+            var img_type = imgB64_src.substring(5, imgB64_src.indexOf(';'))
+
+            // New Canvas
+            var canvas = document.createElement('canvas')
+            canvas.width = rw
+            canvas.height = rh
+            // Draw (Resize)
+            var ctx = canvas.getContext('2d')
+
+            imgs[i].setAttribute('crossorigin', 'anonymous')
+            ctx.drawImage(imgs[i], 0, 0, rw, rh)
+
+            // Destination Image
+            var imgB64_dst = canvas.toDataURL(img_type)
+
+            // imgs[i].src = imgB64_dst
+
+            var createRandomId = () => {
+              var c = 'abcdefghijklmnopqrstuvwxyz0123456789'
+              var cl = c.length
+              var r = ''
+              for (var i = 0; i < 8; i++) {
+                r += c[Math.floor(Math.random() * cl)]
+              }
+              return r
+            }
+
+            var imgId = location.pathname.split('/')[3] + '-' + createRandomId()
+
+            // ストレージオブジェクト作成
+            var storageRef = strage.ref()
+            // ファイルのパスを設定
+            var imgRef = storageRef.child(`articles/contents/${imgId}.jpg`)
+            // ファイルを適用してファイルアップロード開始
+            //  imgRef.put(this.imageFile).then(snapshot => {
+            var imgUrl = await imgRef.putString(imgB64_dst.split(',')[1], 'base64').then(async (snapshot) => {
+              var url = await snapshot.ref.getDownloadURL().then(async (downloadURL) => {
+                return downloadURL
+              })
+              return url
+            })
+
+            imgs[i].src = imgUrl
+          }
+        } // for
+
+        resolve(true)
+      })
     }
   }
 }
