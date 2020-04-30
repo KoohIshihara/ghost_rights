@@ -14,7 +14,7 @@
     "eslint-plugin-pug": "^1.1.1",
     "firebase": "^5.9.4",
     "firebaseui": "^3.5.2",
-    "jquery": "^3.4.1",
+    "jquery": "^3.5.0",
     "medium-editor-insert-plugin": "^2.5.1",
     "moment": "^2.24.0",
     "node-sass": "^4.12.0",
